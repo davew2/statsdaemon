@@ -67,6 +67,7 @@ var (
 	debug            = flag.Bool("debug", false, "print statistics sent to graphite")
 	showVersion      = flag.Bool("version", false, "print version string")
 	persistCountKeys = flag.Int64("persist-count-keys", 60, "number of flush-interval's to persist count keys")
+	statsPrefix      = flag.String("prefix", "", "prefix for every stat received by this daemon")
 	percentThreshold = Percentiles{}
 )
 
@@ -222,7 +223,7 @@ func processTimers(buffer *bytes.Buffer, now int64, pctls Percentiles) int64 {
 					// math.Floor(x + 0.5)
 					indexOfPerc := int(math.Floor(((abs / 100.0) * float64(count)) + 0.5))
 					if pct.float >= 0 {
-						indexOfPerc -= 1  // index offset=0
+						indexOfPerc -= 1 // index offset=0
 					}
 					maxAtThreshold = t[indexOfPerc]
 				}
@@ -289,7 +290,7 @@ func parseMessage(data []byte) []*Packet {
 		}
 
 		packet := &Packet{
-			Bucket:   string(item[1]),
+			Bucket:   statsPrefix + string(item[1]),
 			Value:    value,
 			Modifier: modifier,
 			Sampling: float32(sampleRate),
@@ -325,6 +326,7 @@ func udpListener() {
 func main() {
 	flag.Parse()
 
+	statsPrefix += "."
 	if *showVersion {
 		fmt.Printf("statsdaemon v%s (built w/%s)\n", VERSION, runtime.Version())
 		return
