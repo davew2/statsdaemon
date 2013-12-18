@@ -290,7 +290,7 @@ func parseMessage(data []byte) []*Packet {
 		}
 
 		packet := &Packet{
-			Bucket:   statsPrefix + string(item[1]),
+			Bucket:   *statsPrefix + string(item[1]),
 			Value:    value,
 			Modifier: modifier,
 			Sampling: float32(sampleRate),
@@ -326,7 +326,7 @@ func udpListener() {
 func main() {
 	flag.Parse()
 
-	statsPrefix += "."
+	*statsPrefix += "."
 	if *showVersion {
 		fmt.Printf("statsdaemon v%s (built w/%s)\n", VERSION, runtime.Version())
 		return
